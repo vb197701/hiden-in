@@ -3,7 +3,7 @@ name: Auto Renew
 on:
   workflow_dispatch:
   schedule:
-    - cron: "33 0 * * *"
+    - cron: '33 1 * * *'
 
 permissions:
   contents: write
@@ -71,3 +71,26 @@ jobs:
             git commit -m "⏱️ 更新时间文件: $(date +'%Y-%m-%d %H:%M:%S')"
             git push origin HEAD:main
           fi
+
+      # ✅ 成功时发送 Telegram 通知
+      - name: Telegram notify on success
+        if: success()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TG_CHAT_ID }}
+          token: ${{ secrets.TG_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ✅ HidenCloud 续费成功
+
+      # ❌ 失败时发送 Telegram 通知
+      - name: Telegram notify on failure
+        if: failure()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TG_CHAT_ID }}
+          token: ${{ secrets.TG_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ❌ HidenCloud 续费失败
+            可到 Actions 页面查看日志和 error-screenshots
