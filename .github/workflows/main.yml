@@ -3,7 +3,7 @@ name: Auto Run
 on:
   workflow_dispatch:
   schedule:
-    - cron: '33 6 * * 7'
+    - cron: '33 18 * * 7'
 
 permissions:
   contents: write
