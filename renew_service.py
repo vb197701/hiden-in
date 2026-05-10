@@ -5,13 +5,12 @@ import random
 from playwright.sync_api import sync_playwright
 
 # --- 全局配置 ---
-HIDENCLOUD_COOKIE = os.environ.get('HIDENCLOUD_COOKIE')
 HIDENCLOUD_EMAIL = os.environ.get('HIDENCLOUD_EMAIL')
 HIDENCLOUD_PASSWORD = os.environ.get('HIDENCLOUD_PASSWORD')
 
 BASE_URL = "https://dash.hidencloud.com"
 LOGIN_URL = f"{BASE_URL}/auth/login"
-SERVICE_URL = f"{BASE_URL}/service/71879/manage" # 请确认这是你的服务ID
+SERVICE_URL = f"{BASE_URL}/service/211522/manage" # 请确认这是你的服务ID
 COOKIE_NAME = "remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d"
 
 def log(message):
