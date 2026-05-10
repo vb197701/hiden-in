@@ -22,7 +22,7 @@ jobs:
         with:
           repository: ${{ secrets.PRIVATE_REPO_NAME }} 
           token: ${{ secrets.PRIVATE_REPO_TOKEN }}  # PAT
-          path: /
+          path: renew-private
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -45,7 +45,7 @@ jobs:
           HIDENCLOUD_EMAIL: ${{ secrets.HIDENCLOUD_EMAIL }}
           HIDENCLOUD_PASSWORD: ${{ secrets.HIDENCLOUD_PASSWORD }}
           HIDENCLOUD_SERVICE_ID: "211522"
-        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python -u renew_service.py
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python -u renew-private/renew_service.py
 
       - name: Upload error artifacts
         if: failure()
