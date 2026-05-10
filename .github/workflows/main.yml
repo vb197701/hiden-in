@@ -1,0 +1,73 @@
+name: Auto Renew
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '33 18 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  renew-job:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Checkout private repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.PRIVATE_REPO_NAME }} 
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}  # PAT
+          path: renew-repo 
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+
+      - name: Install Playwright and Chrome
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chrome
+
+      - name: Run Renew Script with XVFB
+        env:
+          HIDENCLOUD_COOKIE: ${{ secrets.HIDENCLOUD_COOKIE }}
+          HIDENCLOUD_EMAIL: ${{ secrets.HIDENCLOUD_EMAIL }}
+          HIDENCLOUD_PASSWORD: ${{ secrets.HIDENCLOUD_PASSWORD }}
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" python -u renew_service.py
+
+      - name: Upload error artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-screenshots
+          path: "*.png"
+
+      - name: Commit time.txt to repo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ ! -f time.txt ]; then
+            echo "首次生成时间：$(date +'%Y-%m-%d %H:%M:%S')" > time.txt
+          else
+            echo "$(date +'%Y-%m-%d %H:%M:%S')" > time.txt
+          fi
+          git add time.txt
+          if git diff --cached --quiet; then
+            echo "无变化，无需提交"
+          else
+            git commit -m "⏱️ 更新时间文件: $(date +'%Y-%m-%d %H:%M:%S')"
+            git push origin HEAD:main
+          fi
