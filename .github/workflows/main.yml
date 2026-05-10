@@ -22,7 +22,7 @@ jobs:
         with:
           repository: ${{ secrets.PRIVATE_REPO_NAME }} 
           token: ${{ secrets.PRIVATE_REPO_TOKEN }}  # PAT
-          path: renew-repo 
+          path: /
 
       - name: Set up Python
         uses: actions/setup-python@v5
